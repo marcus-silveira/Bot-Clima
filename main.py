@@ -1,13 +1,12 @@
 import requests
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
-
+from datetime import datetime
 from credenciais import telegram_bot, weather
 
 token_bot = telegram_bot.get("token")
 token_weather = weather.get("token")
 city = weather.get("id_city")
-id_chat = 1302198624
 
 
 class WeatherForecastBot:
@@ -17,6 +16,7 @@ class WeatherForecastBot:
         self.token_wt = token_weather
         self.token_tlgm = token_telegram
         self.bot = ApplicationBuilder().token(token_bot).build()
+        self.data = datetime.now()
 
     def register_id(self):
         headers = {'Content-Type': 'application/x-www-form-urlencoded'}
@@ -28,7 +28,8 @@ class WeatherForecastBot:
     def current_weather(self):
         link = f"http://apiadvisor.climatempo.com.br/api/v1/weather/locale/{self.id_city}/current?token={self.token_wt}"
         response = requests.get(link).json()
-        information = f"Previsão do tempo atualmente em {response.get('name')}, {response.get('state')}\n" \
+        information = f"{self.data.strftime('%d/%m/%y %H:%M')}\n" \
+                      f"Previsão do tempo atualmente em {response.get('name')}, {response.get('state')}\n" \
                       f"Temperatura: {response['data'].get('temperature')}°C\n" \
                       f"Sensação térmica: {response['data'].get('sensation')}°C\n" \
                       f"Condições: {response['data'].get('condition')}"
